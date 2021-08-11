@@ -56,7 +56,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="JsonConverters\NativeNamespaceConverter.cs" />
     <Compile Include="Models\Native.cs" />
     <Compile Include="Models\NativeNamespace.cs" />
     <Compile Include="Models\NativeParam.cs" />
