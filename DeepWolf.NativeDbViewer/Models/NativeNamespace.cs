@@ -1,9 +1,7 @@
-﻿using DeepWolf.NativeDbViewer.JsonConverters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace DeepWolf.NativeDbViewer.Models
 {
-    [JsonConverter(typeof(NativeNamespaceConverter))]
     [JsonObject]
     public class NativeNamespace
     {
