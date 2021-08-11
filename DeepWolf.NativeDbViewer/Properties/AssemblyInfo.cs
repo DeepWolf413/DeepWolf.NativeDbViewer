@@ -7,7 +7,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DeepWolf.NativeDbViewer")]
-[assembly: AssemblyCopyright("Copyright © jespe 2021")]
+[assembly: AssemblyCopyright("Copyright © DeepWolf 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
