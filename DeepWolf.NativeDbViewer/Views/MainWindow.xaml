@@ -66,6 +66,11 @@
                     <Views:DbViewer NativeDbLink="https://raw.githubusercontent.com/alloc8or/rdr3-nativedb-data/master/natives.json" />
                 </TabItem.Content>
             </TabItem>
+            <TabItem Header="Max Payne 3" hc:ThemeManager.RequestedAccentColor="Orange">
+                <TabItem.Content>
+                    <Views:DbViewer NativeDbLink="https://raw.githubusercontent.com/alloc8or/mp3-nativedb-data/master/natives.json" />
+                </TabItem.Content>
+            </TabItem>
         </TabControl>
     </Grid>
 </hc:Window>
