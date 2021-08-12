@@ -4,7 +4,9 @@ using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using DeepWolf.NativeDbViewer.Models;
 using Newtonsoft.Json.Linq;
 using Prism.Commands;
@@ -26,10 +28,10 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         {
             LoadNativeDbCommand = new DelegateCommand<string>(LoadNativeDb);
             SearchCommand = new DelegateCommand<string>(StartSearch);
-            
+
             loadedNatives = new List<NativeViewModel>();
             NativeList = new ObservableCollection<NativeViewModel>();
-            
+
             isNativeDbLoaded = false;
             StatusText = string.Empty;
         }
@@ -66,13 +68,15 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         public ICommand LoadNativeDbCommand { get; }
 
         public ICommand SearchCommand { get; }
-        
+
         private async void LoadNativeDb(string dbLink)
         {
             if (string.IsNullOrEmpty(dbLink) || isNativeDbLoaded)
-            { return; }
+            {
+                return;
+            }
 
-            StatusText = "Loading native db...";
+            StatusText = "Loading natives...";
             IsBusy = true;
 
             using (WebClient client = new WebClient())
@@ -92,7 +96,7 @@ namespace DeepWolf.NativeDbViewer.ViewModels
                             {
                                 Native nativeObject = native.First.ToObject<Native>();
                                 nativeObject.Namespace = namespaceName;
-                                nativeObject.Hash = ((JProperty)native).Name;
+                                nativeObject.Hash = ((JProperty) native).Name;
                                 loadedNatives.Add(new NativeViewModel(nativeObject));
                             }
                         }
@@ -105,7 +109,10 @@ namespace DeepWolf.NativeDbViewer.ViewModels
                 }
             }
 
-            NativeList.AddRange(loadedNatives);
+
+            await Application.Current.Dispatcher.BeginInvoke((Action) delegate { NativeList.AddRange(loadedNatives); },
+                DispatcherPriority.Background);
+
             isNativeDbLoaded = true;
 
             IsBusy = false;
@@ -115,7 +122,7 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         /// Initiates a search in the native db, based on the given <paramref name="searchText"/>.
         /// </summary>
         /// <param name="searchText">The text to use for searching the native db.</param>
-        private void StartSearch(string searchText)
+        private async void StartSearch(string searchText)
         {
             if (string.IsNullOrEmpty(searchText))
             {
@@ -126,25 +133,38 @@ namespace DeepWolf.NativeDbViewer.ViewModels
             StatusText = "Searching...";
             IsBusy = true;
 
-            NativeList.Clear();
-
-            // TODO: Implement search logic.
-            string searchTextLowered = searchText.ToLower();
-            foreach (var native in loadedNatives)
+            await Application.Current.Dispatcher.BeginInvoke((Action) delegate
             {
-                if (!native.Name.ToLower().Contains(searchTextLowered))
-                { continue; }
+                NativeList.Clear();
 
-                NativeList.Add(native);
-            }
-            
+                // TODO: Implement search logic.
+                string searchTextLowered = searchText.ToLower();
+                foreach (var native in loadedNatives)
+                {
+                    if (!native.Name.ToLower().Contains(searchTextLowered))
+                    {
+                        continue;
+                    }
+
+                    NativeList.Add(native);
+                }
+            }, DispatcherPriority.Background);
+
             IsBusy = false;
         }
 
-        private void ClearSearch()
+        private async void ClearSearch()
         {
-            NativeList.Clear();
-            NativeList.AddRange(loadedNatives);
+            StatusText = "Clearing search...";
+            IsBusy = true;
+
+            await Application.Current.Dispatcher.BeginInvoke((Action) delegate
+            {
+                NativeList.Clear();
+                NativeList.AddRange(loadedNatives);
+            }, DispatcherPriority.Background);
+
+            IsBusy = false;
         }
     }
 }
