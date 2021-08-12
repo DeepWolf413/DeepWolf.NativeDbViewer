@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>NVIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="HandyControls" Version="3.3.7" />
     <PackageReference Include="Newtonsoft.Json">
@@ -93,6 +96,8 @@
       <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="NVIcon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
