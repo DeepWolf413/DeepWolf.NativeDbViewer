@@ -59,9 +59,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\GameInfo.cs" />
     <Compile Include="Models\Native.cs" />
     <Compile Include="Models\NativeNamespace.cs" />
     <Compile Include="Models\NativeParam.cs" />
+    <Compile Include="Models\ScriptUsage.cs" />
     <Compile Include="ViewModels\DbViewerViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Bootstrapper.cs" />
@@ -98,6 +100,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NVIcon.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="games-native-info.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

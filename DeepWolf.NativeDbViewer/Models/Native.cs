@@ -7,15 +7,16 @@ namespace DeepWolf.NativeDbViewer.Models
     public class Native
     {
         [JsonConstructor]
-        public Native(string namespaceName, string name, string hash, string comment, NativeParam[] parameters, string returnType, string build)
+        public Native(string namespaceName, string name, string comment, NativeParam[] parameters, string returnType, string build)
         {
             Namespace = namespaceName;
             Name = name;
-            Hash = hash;
             Comment = comment;
             Parameters = parameters;
             ReturnType = returnType;
             Build = build;
+            Hash = string.Empty;
+            ScriptUsage = string.Empty;
         }
 
         public string Namespace { get; set; }
@@ -23,9 +24,6 @@ namespace DeepWolf.NativeDbViewer.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("jhash")]
-        public string Hash { get; set; }
-        
         [JsonProperty("comment")]
         public string Comment { get; set; }
 
@@ -37,6 +35,10 @@ namespace DeepWolf.NativeDbViewer.Models
 
         [JsonProperty("build")]
         public string Build { get; set; }
+
+        public string Hash { get; set; }
+
+        public string ScriptUsage { get; set; }
 
         public override string ToString()
         {

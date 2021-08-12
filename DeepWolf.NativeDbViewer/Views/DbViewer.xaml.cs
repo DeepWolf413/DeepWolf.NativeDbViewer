@@ -13,12 +13,12 @@ namespace DeepWolf.NativeDbViewer.Views
             InitializeComponent();
         }
 
-        public static readonly DependencyProperty NativeDbLinkProperty = DependencyProperty.Register("NativeDbLink", typeof(string), typeof(DbViewer), new PropertyMetadata(default(string)));
+        public static readonly DependencyProperty GameNameProperty = DependencyProperty.Register("GameName", typeof(string), typeof(DbViewer), new PropertyMetadata(default(string)));
 
-        public string NativeDbLink
+        public string GameName
         {
-            get => (string) GetValue(NativeDbLinkProperty);
-            set => SetValue(NativeDbLinkProperty, value);
+            get => (string) GetValue(GameNameProperty);
+            set => SetValue(GameNameProperty, value);
         }
     }
 }

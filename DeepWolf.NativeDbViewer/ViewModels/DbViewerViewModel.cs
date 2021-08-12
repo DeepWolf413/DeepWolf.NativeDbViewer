@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using DeepWolf.NativeDbViewer.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Prism.Commands;
 using MessageBox = HandyControl.Controls.MessageBox;
@@ -16,6 +19,8 @@ namespace DeepWolf.NativeDbViewer.ViewModels
 {
     public class DbViewerViewModel : BindableBase
     {
+        private const string NativeDBFilePath = "games-native-info.json";
+
         private NativeViewModel selectedNativeItem;
 
         private List<NativeViewModel> loadedNatives;
@@ -26,7 +31,7 @@ namespace DeepWolf.NativeDbViewer.ViewModels
 
         public DbViewerViewModel()
         {
-            LoadNativeDbCommand = new DelegateCommand<string>(LoadNativeDb);
+            LoadNativesCommand = new DelegateCommand<string>(LoadNatives);
             SearchCommand = new DelegateCommand<string>(StartSearch);
 
             loadedNatives = new List<NativeViewModel>();
@@ -65,29 +70,63 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         /// </summary>
         public ObservableCollection<NativeViewModel> NativeList { get; }
 
-        public ICommand LoadNativeDbCommand { get; }
+        public ICommand LoadNativesCommand { get; }
 
         public ICommand SearchCommand { get; }
 
-        private async void LoadNativeDb(string dbLink)
+        private async void LoadNatives(string gameName)
         {
-            if (string.IsNullOrEmpty(dbLink) || isNativeDbLoaded)
+            if (isNativeDbLoaded)
             {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(gameName))
+            {
+                MessageBox.Show($"Failed to load natives. The given game name is null or empty.",
+                    "Something went wrong!", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             StatusText = "Loading natives...";
             IsBusy = true;
 
-            using (WebClient client = new WebClient())
+            try
             {
-                try
+                if (!File.Exists(NativeDBFilePath))
                 {
-                    string json = await client.DownloadStringTaskAsync(dbLink);
-                    var parsedJson = JObject.Parse(json);
+                    MessageBox.Show($"The file path '{NativeDBFilePath}' doesn't exist.", "Invalid file path",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-                    await Task.Run(() =>
+                await Task.Run(async () =>
+                {
+                    string availableGamesJson = File.ReadAllText(NativeDBFilePath);
+                    var parsedJson = JObject.Parse(availableGamesJson);
+                    JToken gameDataToken = parsedJson[gameName];
+                    if (gameDataToken == null)
                     {
+                        MessageBox.Show(
+                            $"The game '{gameName}' could not be found in the '{Path.GetFileNameWithoutExtension(NativeDBFilePath)}' file.",
+                            "Failed to find game info", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    var gameInfo = gameDataToken.ToObject<GameInfo>();
+
+                    using (WebClient client = new WebClient())
+                    {
+                        string nativeDbJson = await client.DownloadStringTaskAsync(gameInfo.NativesLink).ConfigureAwait(false);
+                        parsedJson = JObject.Parse(nativeDbJson);
+                        ScriptUsage[] scriptUsages = new ScriptUsage[0];
+
+                        if (!string.IsNullOrEmpty(gameInfo.ScriptUsagesMapLink))
+                        {
+                            string scriptUsagesMapJson = await client.DownloadStringTaskAsync(gameInfo.ScriptUsagesMapLink).ConfigureAwait(false);
+                            scriptUsages = JsonConvert.DeserializeObject<ScriptUsage[]>(scriptUsagesMapJson);
+                        }
+                        
                         foreach (var nativeNamespace in parsedJson)
                         {
                             string namespaceName = nativeNamespace.Key;
@@ -97,18 +136,27 @@ namespace DeepWolf.NativeDbViewer.ViewModels
                                 Native nativeObject = native.First.ToObject<Native>();
                                 nativeObject.Namespace = namespaceName;
                                 nativeObject.Hash = ((JProperty) native).Name;
+
+                                if (scriptUsages.Length > 0)
+                                {
+                                    ScriptUsage scriptUsage = scriptUsages.FirstOrDefault(source => source.Hash == nativeObject.Hash);
+
+                                    if (scriptUsage != null)
+                                    { nativeObject.ScriptUsage = scriptUsage.CodeExample; }
+                                }
+
                                 loadedNatives.Add(new NativeViewModel(nativeObject));
                             }
                         }
-                    });
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message, "Something went wrong!");
-                    return;
-                }
+                    }
+                }).ConfigureAwait(false);
             }
-
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Something went wrong!", MessageBoxButton.OK, MessageBoxImage.Error);
+                isBusy = false;
+                return;
+            }
 
             await Application.Current.Dispatcher.BeginInvoke((Action) delegate { NativeList.AddRange(loadedNatives); },
                 DispatcherPriority.Background);
@@ -126,7 +174,7 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         {
             if (string.IsNullOrEmpty(searchText))
             {
-                ClearSearch();
+                await ClearSearch();
                 return;
             }
 
@@ -153,7 +201,7 @@ namespace DeepWolf.NativeDbViewer.ViewModels
             IsBusy = false;
         }
 
-        private async void ClearSearch()
+        private async Task ClearSearch()
         {
             StatusText = "Clearing search...";
             IsBusy = true;

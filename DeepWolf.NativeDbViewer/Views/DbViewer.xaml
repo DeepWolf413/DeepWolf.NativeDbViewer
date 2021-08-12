@@ -33,7 +33,7 @@
 
     <hc:Interaction.Triggers>
         <hc:EventTrigger EventName="Loaded">
-            <hc:InvokeCommandAction Command="{Binding LoadNativeDbCommand}" CommandParameter="{Binding NativeDbLink, ElementName=DbViewerControl}" />
+            <hc:InvokeCommandAction Command="{Binding LoadNativesCommand}" CommandParameter="{Binding GameName, ElementName=DbViewerControl}" />
         </hc:EventTrigger>
     </hc:Interaction.Triggers>
 
@@ -46,82 +46,93 @@
             <hc:SearchBar Margin="0,0, 0,5" Command="{Binding SearchCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
         </Grid>
         <Grid Grid.Row="1" DockPanel.Dock="Top" VerticalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="300" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <DataGrid Grid.Row="0" Grid.Column="0" Margin="0, 0, 5, 0" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" SelectedItem="{Binding SelectedNativeItem}" ItemsSource="{Binding  Source={StaticResource GroupedNativeList}}" IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding FullNativeString}" ClipboardContentBinding="{Binding FullNativeString}" Header="Native" Width="*"/>
-                        <DataGridTextColumn Binding="{Binding Hash}" ClipboardContentBinding="{Binding Hash}" Header="Hash" Width="150"/>
-                        <DataGridTextColumn Binding="{Binding CommentTruncated}" ClipboardContentBinding="{Binding Comment}" Header="Comment" Width="*"/>
-                        <DataGridTextColumn Binding="{Binding Build}" ClipboardContentBinding="{Binding Build}" Header="Build" Width="50"/>
-                    </DataGrid.Columns>
-                    <DataGrid.GroupStyle>
-                        <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
-                            <GroupStyle.Panel>
-                                <ItemsPanelTemplate>
-                                    <DataGridRowsPresenter />
-                                </ItemsPanelTemplate>
-                            </GroupStyle.Panel>
-                        </GroupStyle>
-                    </DataGrid.GroupStyle>
-                </DataGrid>
-                <GroupBox Grid.Row="0" Grid.Column="1" Margin="5, 0, 0, 0" Header="Native Information">
-                    <ScrollViewer Margin="5, 0">
-                        <StackPanel Orientation="Vertical">
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Name" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
-                                <TextBox Grid.Column="1"  Text="{Binding Path=  SelectedNativeItem.Name, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
-                            </Grid>
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Hash" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
-                                <TextBox Grid.Column="1"  Text="{Binding Path=  SelectedNativeItem.Hash, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
-                            </Grid>
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Params" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
-                                <TextBox Grid.Column="1" Text="{Binding Path=  SelectedNativeItem.Parameters, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
-                            </Grid>
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Return Type" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
-                                <TextBox Grid.Column="1" Text="{Binding Path=  SelectedNativeItem.ReturnType, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
-                            </Grid>
-                            <StackPanel HorizontalAlignment="Stretch">
-                                <TextBlock Text="Comment"  VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
-                                <TextBox Text="{Binding Path=  SelectedNativeItem.Comment, Mode=OneWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MinHeight="60" MaxHeight="300" IsReadOnly="True" HorizontalAlignment="Stretch" VerticalContentAlignment="Top" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="300" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <DataGrid Grid.Row="0" Grid.Column="0" Margin="0, 0, 5, 0" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" SelectedItem="{Binding SelectedNativeItem}" ItemsSource="{Binding  Source={StaticResource GroupedNativeList}}" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding FullNativeString}" ClipboardContentBinding="{Binding FullNativeString}" Header="Native" Width="*"/>
+                    <DataGridTextColumn Binding="{Binding Hash}" ClipboardContentBinding="{Binding Hash}" Header="Hash" Width="150"/>
+                    <DataGridTextColumn Binding="{Binding CommentTruncated}" ClipboardContentBinding="{Binding Comment}" Header="Comment" Width="*"/>
+                    <DataGridTextColumn Binding="{Binding Build}" ClipboardContentBinding="{Binding Build}" Header="Build" Width="50"/>
+                </DataGrid.Columns>
+                <DataGrid.GroupStyle>
+                    <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <DataGridRowsPresenter />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
+            </DataGrid>
+            <GridSplitter Grid.Column="0" Grid.Row="0" Margin="0, 0, 0, 0" BorderThickness="1" BorderBrush="#FF686868" />
+            <GroupBox Grid.Row="0" Grid.Column="1" Margin="3, 0, 0, 0" Header="Native Information">
+                <ScrollViewer Margin="5, 0">
+                    <StackPanel Orientation="Vertical">
+                        <Expander Header="General">
+                            <StackPanel>
+                                <Grid HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Name" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                                    <TextBox Grid.Column="1"  Text="{Binding Path=  SelectedNativeItem.Name, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                                </Grid>
+                                <Grid HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Hash" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                                    <TextBox Grid.Column="1"  Text="{Binding Path=  SelectedNativeItem.Hash, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                                </Grid>
+                                <Grid Visibility="{Binding Path=SelectedNativeItem.HasParams, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Params" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                                    <TextBox Grid.Column="1" Text="{Binding Path=  SelectedNativeItem.Parameters, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                                </Grid>
+                                <Grid HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Return Type" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                                    <TextBox Grid.Column="1" Text="{Binding Path=  SelectedNativeItem.ReturnType, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                                </Grid>
+                                <Grid HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Build" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                                    <TextBox Grid.Column="1" Text="{Binding Path=  SelectedNativeItem.Build, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
+                                </Grid>
                             </StackPanel>
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Build" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
-                                <TextBox Grid.Column="1" Text="{Binding Path=  SelectedNativeItem.Build, Mode=OneWay}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" />
-                            </Grid>
+                        </Expander>
+                        <hc:Divider />
+                        <StackPanel Visibility="{Binding Path=SelectedNativeItem.HasComment, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Stretch">
+                            <TextBlock Text="Comment"  VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                            <TextBox Text="{Binding Path=  SelectedNativeItem.Comment, Mode=OneWay}" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" MinHeight="60" MaxHeight="150" IsReadOnly="True" HorizontalAlignment="Stretch" VerticalContentAlignment="Top" />
                         </StackPanel>
-                    </ScrollViewer>
-                </GroupBox>
-            <StackPanel Grid.Row="1" x:Name="LoadingStatus" Margin="0, 15" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Orientation="Horizontal">
+
+                        <StackPanel Visibility="{Binding Path=SelectedNativeItem.HasScriptUsage, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Stretch">
+                            <TextBlock Text="Script Usage"  VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" />
+                            <TextBox Text="{Binding Path=  SelectedNativeItem.ScriptUsage, Mode=OneWay}" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" MinHeight="60" MaxHeight="300" IsReadOnly="True" HorizontalAlignment="Stretch" VerticalContentAlignment="Top" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </GroupBox>
+            <StackPanel Grid.Row="1" Grid.Column="0" x:Name="LoadingStatus" Margin="0, 15" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Orientation="Horizontal">
                 <hc:LoadingCircle VerticalAlignment="Center" />
                 <TextBlock Text="{Binding StatusText}" Margin="15, 0, 0, 0" VerticalAlignment="Center" FontSize="14" />
             </StackPanel>

@@ -29,17 +29,17 @@
         <TabControl Style="{StaticResource TabControlInLine}" >
             <TabItem Header="Grand Theft Auto 5" hc:ThemeManager.RequestedAccentColor="Green">
                 <TabItem.Content>
-                    <Views:DbViewer NativeDbLink="https://raw.githubusercontent.com/alloc8or/gta5-nativedb-data/master/natives.json" />
+                    <Views:DbViewer GameName="GTA5" />
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Red Dead Redemption 2" hc:ThemeManager.RequestedAccentColor="DarkRed">
                 <TabItem.Content>
-                    <Views:DbViewer NativeDbLink="https://raw.githubusercontent.com/alloc8or/rdr3-nativedb-data/master/natives.json" />
+                    <Views:DbViewer GameName="RDR2" />
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Max Payne 3" hc:ThemeManager.RequestedAccentColor="Orange">
                 <TabItem.Content>
-                    <Views:DbViewer NativeDbLink="https://raw.githubusercontent.com/alloc8or/mp3-nativedb-data/master/natives.json" />
+                    <Views:DbViewer GameName="MP3" />
                 </TabItem.Content>
             </TabItem>
         </TabControl>

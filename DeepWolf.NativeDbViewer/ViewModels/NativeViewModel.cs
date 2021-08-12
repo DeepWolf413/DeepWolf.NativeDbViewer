@@ -40,6 +40,8 @@ namespace DeepWolf.NativeDbViewer.ViewModels
             }
         }
 
+        public string ScriptUsage => representedNative.ScriptUsage;
+
         public string Build => representedNative.Build;
 
         public string Parameters
@@ -57,5 +59,9 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         }
 
         public string ReturnType => representedNative.ReturnType;
+
+        public bool HasComment => !string.IsNullOrEmpty(Comment);
+
+        public bool HasScriptUsage => !string.IsNullOrEmpty(ScriptUsage);
     }
 }

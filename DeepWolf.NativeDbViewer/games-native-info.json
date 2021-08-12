@@ -1,0 +1,14 @@
+{
+  "GTA5": {
+    "natives-link": "https://raw.githubusercontent.com/alloc8or/gta5-nativedb-data/master/natives.json",
+    "script-usages-map-link": "https://raw.githubusercontent.com/DeepWolf413/additional-native-data/main/gta5/script-usages-map.json"
+  },
+  "RDR2": {
+    "natives-link": "https://raw.githubusercontent.com/alloc8or/rdr3-nativedb-data/master/natives.json",
+    "script-usages-map-link": "https://raw.githubusercontent.com/DeepWolf413/additional-native-data/main/rdr2/script-usages-map.json"
+  },
+  "MP3": {
+    "natives-link": "https://raw.githubusercontent.com/alloc8or/mp3-nativedb-data/master/natives.json",
+    "script-usages-map-link": ""
+  }
+}
