@@ -99,7 +99,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NVIcon.ico" />
+    <Resource Include="NVIcon.ico" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
