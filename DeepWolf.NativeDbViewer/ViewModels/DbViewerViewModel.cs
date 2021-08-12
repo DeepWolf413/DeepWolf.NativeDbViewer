@@ -185,14 +185,12 @@ namespace DeepWolf.NativeDbViewer.ViewModels
             {
                 NativeList.Clear();
 
-                // TODO: Implement search logic.
                 string searchTextLowered = searchText.ToLower();
                 foreach (var native in loadedNatives)
                 {
-                    if (!native.Name.ToLower().Contains(searchTextLowered))
-                    {
-                        continue;
-                    }
+                    string nativeNameLowered = native.Name.ToLower();
+                    if (!nativeNameLowered.Contains(searchTextLowered))
+                    { continue; }
 
                     NativeList.Add(native);
                 }
