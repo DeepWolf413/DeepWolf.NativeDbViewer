@@ -13,7 +13,6 @@ This is a native db viewer for Grand Theft Auto V, Red Dead Redemption 2, and Ma
 
 ## Planned features
 - Offline viewing (loading from the cache, allowing you to view the native db offline).
-- More search features (so you'll be able to make even more specific searches. One example would be search by namespaces).
 - UI improvements (there's still a lot of stuff that can be done on the UI to improve it, so there's going to be changes to the UI over time).
 
 More planned features will be added over time.
