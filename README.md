@@ -6,6 +6,11 @@ This is a native db viewer for Grand Theft Auto V, Red Dead Redemption 2, and Ma
 - Red Dead Redemption 2
 - Max Payne 3
 
+## Current features
+- View natives for GTA 5, RDR 2, Max Payne 3.
+- Search
+- Native usage examples (thanks to [@DottieDot](https://github.com/DottieDot))
+
 ## Planned features
 - Offline viewing (loading from the cache, allowing you to view the native db offline).
 - More search features (so you'll be able to make even more specific searches. One example would be search by namespaces).
