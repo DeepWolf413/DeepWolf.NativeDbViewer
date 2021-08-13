@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using DeepWolf.NativeDbViewer.Models;
+using ICSharpCode.AvalonEdit.Document;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Prism.Commands;
@@ -28,11 +30,14 @@ namespace DeepWolf.NativeDbViewer.ViewModels
 
         private bool isBusy;
         private string statusText;
+        private TextDocument textDocument;
 
         public DbViewerViewModel()
         {
             LoadNativesCommand = new DelegateCommand<string>(LoadNatives);
             SearchCommand = new DelegateCommand<string>(StartSearch);
+
+            TextDocument = new TextDocument();
 
             loadedNatives = new List<NativeViewModel>();
             NativeList = new ObservableCollection<NativeViewModel>();
@@ -65,6 +70,12 @@ namespace DeepWolf.NativeDbViewer.ViewModels
             private set => SetProperty(ref isBusy, value);
         }
 
+        public TextDocument TextDocument
+        {
+            get => textDocument;
+            private set => SetProperty(ref textDocument, value);
+        }
+
         /// <summary>
         /// The list of natives that will be shown in the viewer.
         /// </summary>
@@ -73,6 +84,18 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         public ICommand LoadNativesCommand { get; }
 
         public ICommand SearchCommand { get; }
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
+        {
+            base.OnPropertyChanged(args);
+            if (args.PropertyName == nameof(SelectedNativeItem))
+            {
+                if (SelectedNativeItem != null)
+                {
+                    TextDocument.Text = SelectedNativeItem.ScriptUsage;
+                }
+            }
+        }
 
         private async void LoadNatives(string gameName)
         {
