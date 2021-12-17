@@ -52,6 +52,8 @@ namespace DeepWolf.NativeDbViewer.ViewModels
             set => SetProperty(ref selectedNativeItem, value);
         }
 
+        public bool IsAnyNativeSelected => SelectedNativeItem != null;
+
         /// <summary>
         /// The status text the view will show when busy.
         /// </summary>
@@ -185,7 +187,6 @@ namespace DeepWolf.NativeDbViewer.ViewModels
                 DispatcherPriority.Background);
 
             isNativeDbLoaded = true;
-
             IsBusy = false;
         }
 

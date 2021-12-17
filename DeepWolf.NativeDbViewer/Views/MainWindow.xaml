@@ -13,36 +13,32 @@
         Height="653.261" 
         Width="1121.739"
         Icon="/DeepWolf.NativeDbViewer;component/NVIcon.ico">
-    <hc:Window.NonClientAreaContent>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Right">
-                <RadioButton Tag="{x:Static hc:ApplicationTheme.Dark}" Click="ButtonSkins_OnClick" Content="Dark" IsChecked="True" />
-                <RadioButton Tag="{x:Static hc:ApplicationTheme.Light}" Click="ButtonSkins_OnClick" Content="Light" />
-            </hc:ButtonGroup>
-        </Grid>
-    </hc:Window.NonClientAreaContent>
-    <Grid>
-        <!--<ContentControl prism:RegionManager.RegionName="ContentRegion"/>-->
-        <TabControl Style="{StaticResource TabControlInLine}" >
-            <TabItem Header="Grand Theft Auto 5" hc:ThemeManager.RequestedAccentColor="Green">
-                <TabItem.Content>
-                    <Views:DbViewer GameName="GTA5" />
-                </TabItem.Content>
-            </TabItem>
-            <TabItem Header="Red Dead Redemption 2" hc:ThemeManager.RequestedAccentColor="DarkRed">
-                <TabItem.Content>
-                    <Views:DbViewer GameName="RDR2" />
-                </TabItem.Content>
-            </TabItem>
-            <TabItem Header="Max Payne 3" hc:ThemeManager.RequestedAccentColor="Orange">
-                <TabItem.Content>
-                    <Views:DbViewer GameName="MP3" />
-                </TabItem.Content>
-            </TabItem>
-        </TabControl>
-    </Grid>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="50"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <!--<ContentControl prism:RegionManager.RegionName="ContentRegion"/>-->
+    <hc:SideMenu Margin="0,0,2,0">
+        <hc:SideMenuItem IsSelected="True" Selected="OnGta5Selected">
+        <hc:SideMenuItem.Icon>
+          <Image Source="../Icons/GTAV.png"></Image>
+        </hc:SideMenuItem.Icon>
+      </hc:SideMenuItem>
+      <hc:SideMenuItem Selected="OnRdr2Selected">
+        <hc:SideMenuItem.Icon>
+          <Image Source="../Icons/RDR2.png"></Image>
+        </hc:SideMenuItem.Icon>
+      </hc:SideMenuItem>
+      <hc:SideMenuItem Selected="OnMp3Selected">
+        <hc:SideMenuItem.Icon>
+          <Image Source="../Icons/MaxPayne3.png"></Image>
+        </hc:SideMenuItem.Icon>
+      </hc:SideMenuItem>
+    </hc:SideMenu>
+    <Views:DbViewer x:Name="GtaVView" Grid.Column="1" GameName="GTA5" ViewerTitle="Grand Theft Auto 5" hc:ThemeManager.RequestedAccentColor="Green" />
+    <Views:DbViewer x:Name="Rdr2View" Grid.Column="1" GameName="RDR2" ViewerTitle="Red Dead Redemption 2" hc:ThemeManager.RequestedAccentColor="DarkRed" Visibility="Collapsed" />
+    <Views:DbViewer x:Name="Mp3View" Grid.Column="1" GameName="MP3" ViewerTitle="Max Payne 3" hc:ThemeManager.RequestedAccentColor="Orange" Visibility="Collapsed" />
+  </Grid>
 </hc:GlowWindow>

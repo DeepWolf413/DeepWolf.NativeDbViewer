@@ -1,31 +1,43 @@
-﻿using HandyControl.Themes;
-using HandyControl.Tools;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using HandyControl.Controls;
-using TabItem = System.Windows.Controls.TabItem;
+﻿using System.Windows;
 
 namespace DeepWolf.NativeDbViewer.Views
 {
     public partial class MainWindow
     {
+        private enum EGame { Gta5, Rdr2, Mp3 }
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        #region Change Theme
-
-        private void ButtonSkins_OnClick(object sender, RoutedEventArgs e)
+        private void SwitchNativeDb(EGame selectedGame)
         {
-            if (e.OriginalSource is RadioButton button)
+            GtaVView.Visibility = Visibility.Collapsed;
+            Rdr2View.Visibility = Visibility.Collapsed;
+            Mp3View.Visibility = Visibility.Collapsed;
+
+            switch (selectedGame)
             {
-                if (button.Tag is ApplicationTheme tag)
-                { ((App) Application.Current).UpdateTheme(tag); }
+                case EGame.Gta5:
+                    GtaVView.Visibility = Visibility.Visible;
+                    break;
+                case EGame.Rdr2:
+                    Rdr2View.Visibility = Visibility.Visible;
+                    break;
+                case EGame.Mp3:
+                    Mp3View.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    MessageBox.Show("The selected game is unknown.");
+                    break;
             }
         }
 
-        #endregion
+        private void OnGta5Selected(object sender, RoutedEventArgs e) => SwitchNativeDb(EGame.Gta5);
+
+        private void OnRdr2Selected(object sender, RoutedEventArgs e) => SwitchNativeDb(EGame.Rdr2);
+
+        private void OnMp3Selected(object sender, RoutedEventArgs e) => SwitchNativeDb(EGame.Mp3);
     }
 }

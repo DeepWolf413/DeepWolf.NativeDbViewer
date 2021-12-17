@@ -1,10 +1,12 @@
-﻿<UserControl xmlns:hc="https://handyorg.github.io/handycontrol"  x:Class="DeepWolf.NativeDbViewer.Views.DbViewer"
+﻿<UserControl xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:tex="clr-namespace:DeepWolf.NativeDbViewer"
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av"  x:Class="DeepWolf.NativeDbViewer.Views.DbViewer"
+             xmlns:converters="clr-namespace:DeepWolf.NativeDbViewer.Converters"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             x:Name="DbViewerControl">
+             x:Name="DbViewerControl" av:DesignHeight="671.045">
     <UserControl.Resources>
         <Style x:Key="GroupHeaderStyle" TargetType="{x:Type GroupItem}">
             <Setter Property="Template">
@@ -14,7 +16,7 @@
                             <Expander.Header>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding Name}" />
-                                    <TextBlock Text="{Binding ItemCount, StringFormat={} ({0})}" />
+                                    <TextBlock Text="{Binding ItemCount, StringFormat=' (\{0\})'}" />
                                 </StackPanel>
                             </Expander.Header>
                             <ItemsPresenter />
@@ -30,6 +32,7 @@
         </CollectionViewSource>
 
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BooleanToVisibilityMultiConverter x:Key="BoolToVisMulti" />
     </UserControl.Resources>
 
     <hc:Interaction.Triggers>
@@ -39,72 +42,99 @@
     </hc:Interaction.Triggers>
 
     <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <hc:SearchBar Margin="0,0, 0,5" Command="{Binding SearchCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
-        </Grid>
-        <Grid Grid.Row="1" DockPanel.Dock="Top" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="300" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <DataGrid Grid.Row="0" Grid.Column="0" Margin="0, 0, 5, 0" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" SelectedItem="{Binding SelectedNativeItem}" ItemsSource="{Binding  Source={StaticResource GroupedNativeList}}" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding FullNativeString}" ClipboardContentBinding="{Binding FullNativeString}" Header="Native" Width="*"/>
-                    <DataGridTextColumn Binding="{Binding Hash}" ClipboardContentBinding="{Binding Hash}" Header="Hash" Width="150"/>
-                    <DataGridTextColumn Binding="{Binding CommentTruncated}" ClipboardContentBinding="{Binding Comment}" Header="Comment" Width="*"/>
-                    <DataGridTextColumn Binding="{Binding Build}" ClipboardContentBinding="{Binding Build}" Header="Build" Width="50"/>
-                </DataGrid.Columns>
-                <DataGrid.GroupStyle>
-                    <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
-                        <GroupStyle.Panel>
-                            <ItemsPanelTemplate>
-                                <DataGridRowsPresenter />
-                            </ItemsPanelTemplate>
-                        </GroupStyle.Panel>
-                    </GroupStyle>
-                </DataGrid.GroupStyle>
-            </DataGrid>
-            <GridSplitter Grid.Column="0" Grid.Row="0" Margin="0, 0, 0, 0" BorderThickness="1" BorderBrush="#FF686868" />
-            <GroupBox Grid.Row="0" Grid.Column="1" Margin="3, 0, 0, 0" Header="Native Information">
-                <ScrollViewer Margin="5, 0">
-                    <StackPanel Orientation="Vertical">
-                        <Expander Header="General" IsExpanded="True">
-                            <StackPanel>
-                                <TextBox Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="Name" Text="{Binding Path=SelectedNativeItem.Name, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
-                                <TextBox Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="Hash" Text="{Binding Path=SelectedNativeItem.Hash, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
-                                <TextBox Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="Parameters" Text="{Binding Path=SelectedNativeItem.Parameters, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
-                                <TextBox Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="Return Type" Text="{Binding Path=SelectedNativeItem.ReturnType, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
-                                <TextBox Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="Build" Text="{Binding Path=SelectedNativeItem.Build, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
+        <GroupBox Header="{Binding ElementName=DbViewerControl, Path=ViewerTitle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <hc:SearchBar TextType="Common" ShowClearButton="True" hc:InfoElement.Placeholder="Search text..." Margin="0,0, 0,5" Command="{Binding SearchCommand}" CommandParameter="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                </Grid>
+                <Grid Grid.Row="1" DockPanel.Dock="Top" VerticalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="300" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Grid.Row="0" Grid.Column="0" Margin="0, 0, 5, 0" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" SelectedItem="{Binding SelectedNativeItem}" ItemsSource="{Binding Source={StaticResource GroupedNativeList}}" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding FullNativeString}" ClipboardContentBinding="{Binding FullNativeString}" Header="Native" Width="*"/>
+                            <DataGridTextColumn Binding="{Binding Hash}" ClipboardContentBinding="{Binding Hash}" Header="Hash" Width="150"/>
+                            <DataGridTextColumn Binding="{Binding CommentTruncated}" ClipboardContentBinding="{Binding Comment}" Header="Comment" Width="*"/>
+                            <DataGridTextColumn Binding="{Binding Build}" ClipboardContentBinding="{Binding Build}" Header="Build" Width="50"/>
+                        </DataGrid.Columns>
+                        <DataGrid.GroupStyle>
+                            <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
+                                <GroupStyle.Panel>
+                                    <ItemsPanelTemplate>
+                                        <DataGridRowsPresenter />
+                                    </ItemsPanelTemplate>
+                                </GroupStyle.Panel>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
+                    </DataGrid>
+                    <GridSplitter Grid.Column="0" Grid.Row="0" Margin="0, 0, 0, 0" BorderThickness="1" BorderBrush="#FF686868" />
+                    <GroupBox Grid.Row="0" Grid.Column="1" Margin="3, 0, 0, 0" Header="Native Information">
+                        <ScrollViewer Margin="5, 0">
+                            <StackPanel Orientation="Vertical">
+                                <Expander Header="General" IsExpanded="True">
+                                    <StackPanel>
+                                        <TextBox Style="{StaticResource TextBoxExtend}" hc:TitleElement.TitlePlacement="Left" hc:TitleElement.Title="Name" Text="{Binding SelectedNativeItem.Name, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
+                                        <TextBox Style="{StaticResource TextBoxExtend}" hc:TitleElement.TitlePlacement="Left" hc:TitleElement.Title="Hash" Text="{Binding SelectedNativeItem.Hash, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
+                                        <TextBox Style="{StaticResource TextBoxExtend}" hc:TitleElement.TitlePlacement="Left" hc:TitleElement.Title="Parameters" Text="{Binding SelectedNativeItem.Parameters, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
+                                        <TextBox Style="{StaticResource TextBoxExtend}" hc:TitleElement.TitlePlacement="Left" hc:TitleElement.Title="Return Type" Text="{Binding SelectedNativeItem.ReturnType, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
+                                        <TextBox Style="{StaticResource TextBoxExtend}" hc:TitleElement.TitlePlacement="Left" hc:TitleElement.Title="Build" Text="{Binding SelectedNativeItem.Build, Mode=OneWay}" hc:TitleElement.TitleWidth="90" IsReadOnly="True" HorizontalContentAlignment="Right" />
+                                    </StackPanel>
+                                </Expander>
+                                <Expander Header="Other Useful Info" IsExpanded="False">
+                                    <Expander.Visibility>
+                                        <MultiBinding Converter="{StaticResource BoolToVisMulti}">
+                                            <Binding Path="SelectedNativeItem.HasScriptUsage" />
+                                            <Binding Path="SelectedNativeItem.HasComment" />
+                                            <Binding Path="IsAnyNativeSelected" />
+                                        </MultiBinding>
+                                    </Expander.Visibility>
+                                    <StackPanel>
+                                        <TextBox Style="{StaticResource TextBoxExtend}" TextWrapping="Wrap" hc:TitleElement.Title="Comment" Text="{Binding SelectedNativeItem.Comment, Mode=OneWay}" MaxHeight="150" IsReadOnly="True" VerticalContentAlignment="Top">
+                                            <TextBox.Visibility>
+                                                <MultiBinding Converter="{StaticResource BoolToVisMulti}">
+                                                    <Binding Path="SelectedNativeItem.HasComment" />
+                                                    <Binding Path="IsAnyNativeSelected" />
+                                                </MultiBinding>
+                                            </TextBox.Visibility>
+                                        </TextBox>
+                                        <!--<TextBox Style="{StaticResource TextBoxExtend}" Visibility="{Binding Path=SelectedNativeItem.HasScriptUsage, Converter={StaticResource BoolToVis}}" TextWrapping="Wrap" hc:InfoElement.Title="Script Usage" Text="{Binding Path=SelectedNativeItem.ScriptUsage, Mode=OneWay}"  MaxHeight="300" IsReadOnly="True" VerticalContentAlignment="Top" />-->
+                                        <StackPanel>
+                                            <StackPanel.Visibility>
+                                                <MultiBinding Converter="{StaticResource BoolToVisMulti}">
+                                                    <Binding Path="SelectedNativeItem.HasScriptUsage" />
+                                                    <Binding Path="IsAnyNativeSelected" />
+                                                </MultiBinding>
+                                            </StackPanel.Visibility>
+                                            <Label Content="Script Usage" BorderThickness="0" Background="Transparent" HorizontalAlignment="Left" />
+                                            <avalonEdit:TextEditor
+                                      xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                                      x:Name="textEditor"
+                                      SyntaxHighlighting="C++"
+                                      FontFamily="Consolas"
+                                      Document="{Binding TextDocument, Mode=OneWay}"
+                                      FontSize="10pt" MaxHeight="200" IsReadOnly="True" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Expander>
                             </StackPanel>
-                        </Expander>
-                        <hc:Divider />
-                        <TextBox Style="{StaticResource TextBoxExtend}" Visibility="{Binding Path=SelectedNativeItem.HasComment, Converter={StaticResource BoolToVis}}" TextWrapping="Wrap" hc:InfoElement.Title="Comment" Text="{Binding Path=SelectedNativeItem.Comment, Mode=OneWay}" MaxHeight="150" IsReadOnly="True" VerticalContentAlignment="Top" />
-                        <!--<TextBox Style="{StaticResource TextBoxExtend}" Visibility="{Binding Path=SelectedNativeItem.HasScriptUsage, Converter={StaticResource BoolToVis}}" TextWrapping="Wrap" hc:InfoElement.Title="Script Usage" Text="{Binding Path=SelectedNativeItem.ScriptUsage, Mode=OneWay}"  MaxHeight="300" IsReadOnly="True" VerticalContentAlignment="Top" />-->
-                        <StackPanel Visibility="{Binding Path=SelectedNativeItem.HasScriptUsage, Converter={StaticResource BoolToVis}}">
-                            <Label Content="Script Usage" BorderThickness="0" Background="Transparent" HorizontalAlignment="Left" />
-                            <avalonEdit:TextEditor
-                                xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-                                Name="textEditor"
-                                SyntaxHighlighting="C++"
-                                FontFamily="Consolas"
-                                Document="{Binding TextDocument, Mode=OneWay}"
-                                FontSize="10pt" MaxHeight="200" IsReadOnly="True" />
-                        </StackPanel>
+                        </ScrollViewer>
+                    </GroupBox>
+                    <StackPanel Grid.Row="1" Grid.Column="0" x:Name="LoadingStatus" Margin="0, 15" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Orientation="Horizontal">
+                        <hc:LoadingCircle VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding StatusText}" Margin="15, 0, 0, 0" VerticalAlignment="Center" FontSize="14" />
                     </StackPanel>
-                </ScrollViewer>
-            </GroupBox>
-            <StackPanel Grid.Row="1" Grid.Column="0" x:Name="LoadingStatus" Margin="0, 15" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Orientation="Horizontal">
-                <hc:LoadingCircle VerticalAlignment="Center" />
-                <TextBlock Text="{Binding StatusText}" Margin="15, 0, 0, 0" VerticalAlignment="Center" FontSize="14" />
-            </StackPanel>
-        </Grid>
+                </Grid>
+            </Grid>
+        </GroupBox>
     </Grid>
 </UserControl>

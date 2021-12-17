@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\BooleanToVisibilityMultiConverter.cs" />
     <Compile Include="Models\GameInfo.cs" />
     <Compile Include="Models\Native.cs" />
     <Compile Include="Models\NativeNamespace.cs" />
@@ -109,6 +110,11 @@
     <None Include="games-native-info.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\GTAV.png" />
+    <Resource Include="Icons\MaxPayne3.png" />
+    <Resource Include="Icons\RDR2.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
