@@ -5,14 +5,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using DeepWolf.NativeDbViewer.Models;
 using ICSharpCode.AvalonEdit.Document;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Prism.Commands;
 using MessageBox = HandyControl.Controls.MessageBox;
@@ -21,8 +19,6 @@ namespace DeepWolf.NativeDbViewer.ViewModels
 {
     public class DbViewerViewModel : BindableBase
     {
-        private const string NativeDBFilePath = "games-native-info.json";
-
         private NativeViewModel selectedNativeItem;
 
         private List<NativeViewModel> loadedNatives;
@@ -102,9 +98,7 @@ namespace DeepWolf.NativeDbViewer.ViewModels
         private async void LoadNatives(string gameName)
         {
             if (isNativeDbLoaded)
-            {
-                return;
-            }
+            { return; }
 
             if (string.IsNullOrEmpty(gameName))
             {
@@ -118,60 +112,46 @@ namespace DeepWolf.NativeDbViewer.ViewModels
 
             try
             {
-                if (!File.Exists(NativeDBFilePath))
+                if (!File.Exists(GameInfo.GamesNativeInfoFilePath))
                 {
-                    MessageBox.Show($"The file path '{NativeDBFilePath}' doesn't exist.", "Invalid file path",
+                    MessageBox.Show($"The file path '{GameInfo.GamesNativeInfoFilePath}' doesn't exist.", "Invalid file path",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 await Task.Run(async () =>
                 {
-                    string availableGamesJson = File.ReadAllText(NativeDBFilePath);
-                    var parsedJson = JObject.Parse(availableGamesJson);
-                    JToken gameDataToken = parsedJson[gameName];
-                    if (gameDataToken == null)
+                    var (hasFoundGameInfo, gameInfo) = TryGetGameInfo(gameName);
+                    if (!hasFoundGameInfo)
+                    { return; }
+
+                    await gameInfo.UpdateCachedNativeDb();
+
+                    var (hasFoundNativeDb, nativeDb) = await gameInfo.TryGetNativeDbFromCache();
+                    if (!hasFoundNativeDb)
+                    { return; }
+
+                    var (hasFoundScriptUsages, scriptUsages) = await gameInfo.TryGetScriptUsagesFromCache();
+
+                    foreach (var nativeDbNamespace in nativeDb)
                     {
-                        MessageBox.Show(
-                            $"The game '{gameName}' could not be found in the '{Path.GetFileNameWithoutExtension(NativeDBFilePath)}' file.",
-                            "Failed to find game info", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                        string namespaceName = nativeDbNamespace.Key;
+                        var natives = nativeDbNamespace.Value;
 
-                    var gameInfo = gameDataToken.ToObject<GameInfo>();
-
-                    using (WebClient client = new WebClient())
-                    {
-                        string nativeDbJson = await client.DownloadStringTaskAsync(gameInfo.NativesLink).ConfigureAwait(false);
-                        parsedJson = JObject.Parse(nativeDbJson);
-                        ScriptUsage[] scriptUsages = new ScriptUsage[0];
-
-                        if (!string.IsNullOrEmpty(gameInfo.ScriptUsagesMapLink))
+                        foreach (var native in natives)
                         {
-                            string scriptUsagesMapJson = await client.DownloadStringTaskAsync(gameInfo.ScriptUsagesMapLink).ConfigureAwait(false);
-                            scriptUsages = JsonConvert.DeserializeObject<ScriptUsage[]>(scriptUsagesMapJson);
-                        }
-                        
-                        foreach (var nativeNamespace in parsedJson)
-                        {
-                            string namespaceName = nativeNamespace.Key;
+                            string nativeHash = native.Key;
+                            native.Value.Namespace = namespaceName;
+                            native.Value.Hash = nativeHash;
 
-                            foreach (var native in nativeNamespace.Value.Children())
+                            if (hasFoundScriptUsages)
                             {
-                                Native nativeObject = native.First.ToObject<Native>();
-                                nativeObject.Namespace = namespaceName;
-                                nativeObject.Hash = ((JProperty) native).Name;
-
-                                if (scriptUsages.Length > 0)
-                                {
-                                    ScriptUsage scriptUsage = scriptUsages.FirstOrDefault(source => source.Hash == nativeObject.Hash);
-
-                                    if (scriptUsage != null)
-                                    { nativeObject.ScriptUsage = scriptUsage.CodeExample; }
-                                }
-
-                                loadedNatives.Add(new NativeViewModel(nativeObject));
+                                ScriptUsage scriptUsage = scriptUsages.FirstOrDefault(source => source.Hash == nativeHash);
+                                if (scriptUsage != null)
+                                { native.Value.ScriptUsage = scriptUsage.CodeExample; }
                             }
+
+                            loadedNatives.Add(new NativeViewModel(native.Value));
                         }
                     }
                 }).ConfigureAwait(false);
@@ -188,6 +168,31 @@ namespace DeepWolf.NativeDbViewer.ViewModels
 
             isNativeDbLoaded = true;
             IsBusy = false;
+        }
+
+        
+
+        private (bool, GameInfo) TryGetGameInfo(string gameName)
+        {
+            if (!File.Exists(GameInfo.GamesNativeInfoFilePath))
+            {
+                MessageBox.Show($"The file path '{GameInfo.GamesNativeInfoFilePath}' doesn't exist.", "Invalid file path",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return (false, null);
+            }
+
+            string availableGamesJson = File.ReadAllText(GameInfo.GamesNativeInfoFilePath);
+            var parsedJson = JObject.Parse(availableGamesJson);
+            JToken gameDataToken = parsedJson[gameName];
+            if (gameDataToken == null)
+            {
+                MessageBox.Show(
+                    $"The game '{gameName}' could not be found in the '{Path.GetFileNameWithoutExtension(GameInfo.GamesNativeInfoFilePath)}' file.",
+                    "Failed to find game info", MessageBoxButton.OK, MessageBoxImage.Error);
+                return (false, null);
+            }
+
+            return (true, gameDataToken.ToObject<GameInfo>());
         }
 
         /// <summary>
